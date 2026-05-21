@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analog Uhr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..500,0..100&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --fg-muted: rgba(26, 26, 26, 0.48);
+    --fg-faint: rgba(26, 26, 26, 0.22);
+    --face: rgba(26, 26, 26, 0.025);
+    --accent: #c44d2e;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #f0ece4;
+      --fg-muted: rgba(240, 236, 228, 0.5);
+      --fg-faint: rgba(240, 236, 228, 0.22);
+      --face: rgba(240, 236, 228, 0.025);
+      --accent: #e09775;
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--fg);
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 24px;
+    gap: 22px;
+  }
+
+  .clock {
+    width: min(78vmin, 380px);
+    height: min(78vmin, 380px);
+    display: block;
+  }
+
+  .face-bg { fill: var(--face); stroke: var(--fg-faint); stroke-width: 0.4; }
+  .tick-major { stroke: var(--fg); stroke-width: 1.2; stroke-linecap: round; }
+  .tick-minor { stroke: var(--fg-faint); stroke-width: 0.6; stroke-linecap: round; }
+  .numeral {
+    fill: var(--fg);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 11px;
+    font-weight: 400;
+    font-variation-settings: 'opsz' 144, 'SOFT' 60;
+    text-anchor: middle;
+    dominant-baseline: central;
+    letter-spacing: 0.5px;
+  }
+  .hand-hour {
+    stroke: var(--fg);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+  }
+  .hand-minute {
+    stroke: var(--fg);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .hand-second {
+    stroke: var(--accent);
+    stroke-width: 1;
+    stroke-linecap: round;
+  }
+  .pivot-outer { fill: var(--fg); }
+  .pivot-inner { fill: var(--accent); }
+
+  .date {
+    font-size: clamp(1.55rem, 4.8vw, 2.05rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--fg-muted);
+    letter-spacing: 0.04em;
+    font-variation-settings: 'opsz' 14, 'SOFT' 100;
+  }
+  .date .rest {
+    text-transform: lowercase;
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <svg class="clock" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle class="face-bg" cx="100" cy="100" r="95"/>
+
+      <g id="ticks"></g>
+
+      <text class="numeral" x="100" y="24">XII</text>
+      <text class="numeral" x="176" y="100">III</text>
+      <text class="numeral" x="100" y="176">VI</text>
+      <text class="numeral" x="24" y="100">IX</text>
+
+      <line id="hand-h" class="hand-hour" x1="100" y1="100" x2="100" y2="58"/>
+      <line id="hand-m" class="hand-minute" x1="100" y1="100" x2="100" y2="38"/>
+      <line id="hand-s" class="hand-second" x1="100" y1="110" x2="100" y2="30"/>
+
+      <circle class="pivot-outer" cx="100" cy="100" r="3"/>
+      <circle class="pivot-inner" cx="100" cy="100" r="1.4"/>
+    </svg>
+    <div class="date" id="date">—</div>
+  </div>
+
+  <script>
+    // Tick-Marken generieren: 60 Striche, jede 5. ist Hauptstrich
+    const ticksGroup = document.getElementById('ticks');
+    for (let i = 0; i < 60; i++) {
+      const angle = (i * 6) * Math.PI / 180;
+      const isMajor = i % 5 === 0;
+      const outerR = 92;
+      const innerR = isMajor ? 85 : 88;
+      const x1 = 100 + Math.sin(angle) * innerR;
+      const y1 = 100 - Math.cos(angle) * innerR;
+      const x2 = 100 + Math.sin(angle) * outerR;
+      const y2 = 100 - Math.cos(angle) * outerR;
+      const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      tick.setAttribute('x1', x1);
+      tick.setAttribute('y1', y1);
+      tick.setAttribute('x2', x2);
+      tick.setAttribute('y2', y2);
+      tick.setAttribute('class', isMajor ? 'tick-major' : 'tick-minor');
+      ticksGroup.appendChild(tick);
+    }
+
+    const hH = document.getElementById('hand-h');
+    const hM = document.getElementById('hand-m');
+    const hS = document.getElementById('hand-s');
+    const dateEl = document.getElementById('date');
+
+    let lastDateStr = '';
+
+    function tick() {
+      const now = new Date();
+      const ms = now.getMilliseconds();
+      const s = now.getSeconds() + ms / 1000;
+      const m = now.getMinutes() + s / 60;
+      const h = (now.getHours() % 12) + m / 60;
+
+      hH.setAttribute('transform', `rotate(${h * 30} 100 100)`);
+      hM.setAttribute('transform', `rotate(${m * 6} 100 100)`);
+      hS.setAttribute('transform', `rotate(${s * 6} 100 100)`);
+
+      const weekday = now.toLocaleDateString('de-DE', { weekday: 'long' });
+      const rest = now.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+      const dateStr = weekday + ', ' + rest;
+      if (dateStr !== lastDateStr) {
+        dateEl.innerHTML = `<span class="weekday">${weekday}</span><span class="rest">, ${rest}</span>`;
+        lastDateStr = dateStr;
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    tick();
+  </script>
+</body>
+</html>

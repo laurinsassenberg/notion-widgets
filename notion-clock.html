@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Uhr</title>
+<title>Uhr (Test 33px Datum)</title>
 <style>
   :root {
     --fg: #1a1a1a;
-    --fg-muted: rgba(26, 26, 26, 0.55);
+    --fg-muted: rgba(26, 26, 26, 0.65);
     --accent: #c44d2e;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
       --fg: #f0ece4;
-      --fg-muted: rgba(240, 236, 228, 0.55);
+      --fg-muted: rgba(240, 236, 228, 0.65);
       --accent: #e09775;
     }
   }
@@ -48,14 +48,22 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: clamp(14px, 3.2vw, 22px) clamp(16px, 3.6vw, 26px);
-    gap: clamp(8px, 1.8vw, 14px);
+    padding: 0;
+    gap: clamp(10px, 2vw, 16px);
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: clamp(14px, 3vw, 20px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .widget {
+      background: rgba(255, 255, 255, 0.05);
+    }
   }
 
   .time {
-    font-size: clamp(3rem, 11vw, 5.8rem);
+    font-size: clamp(8.47rem, 35.2vw, 12.32rem);
     font-weight: 300;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.035em;
     line-height: 0.9;
     font-variant-numeric: tabular-nums;
     display: flex;
@@ -76,22 +84,23 @@
   }
 
   .seconds {
-    font-size: 0.3em;
+    font-size: 0.28em;
     font-weight: 400;
-    opacity: 0.5;
+    opacity: 0.45;
     letter-spacing: -0.01em;
     align-self: flex-start;
-    margin-top: 0.5em;
-    margin-left: 0.2em;
+    margin-top: 0.55em;
+    margin-left: 0.5em;
     font-variant-numeric: tabular-nums;
   }
 
   .date {
-    font-size: clamp(0.92rem, 2.6vw, 1.1rem);
+    font-size: 37px;
     font-weight: 500;
     color: var(--fg-muted);
     letter-spacing: -0.005em;
     text-align: center;
+    white-space: nowrap;
   }
 </style>
 </head>

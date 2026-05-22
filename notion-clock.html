@@ -4,20 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Uhr</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..500,0..100&display=swap" rel="stylesheet">
 <style>
   :root {
     --fg: #1a1a1a;
-    --fg-muted: rgba(26, 26, 26, 0.48);
+    --fg-muted: rgba(26, 26, 26, 0.55);
     --accent: #c44d2e;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
       --fg: #f0ece4;
-      --fg-muted: rgba(240, 236, 228, 0.5);
+      --fg-muted: rgba(240, 236, 228, 0.55);
       --accent: #e09775;
     }
   }
@@ -29,74 +26,83 @@
     width: 100%;
     overflow: hidden;
     background: transparent;
-    font-family: 'Fraunces', Georgia, serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   .stage {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    padding: 24px;
-    gap: 14px;
+    padding: 12px;
+  }
+
+  .widget {
+    width: 100%;
+    max-width: 560px;
+    aspect-ratio: 2.05 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(14px, 3.2vw, 22px) clamp(16px, 3.6vw, 26px);
+    gap: clamp(8px, 1.8vw, 14px);
   }
 
   .time {
-    font-size: clamp(4rem, 15vw, 9rem);
+    font-size: clamp(3rem, 11vw, 5.8rem);
     font-weight: 300;
-    font-variation-settings: 'opsz' 144, 'SOFT' 50;
     letter-spacing: -0.04em;
-    line-height: 0.85;
+    line-height: 0.9;
     font-variant-numeric: tabular-nums;
     display: flex;
     align-items: baseline;
-    gap: 0.03em;
+    gap: 0.02em;
   }
 
   .separator {
     color: var(--accent);
+    font-weight: 300;
+    margin: 0 0.04em;
     animation: pulse 2s ease-in-out infinite;
-    margin: 0 0.02em;
   }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    50% { opacity: 0.25; }
   }
 
   .seconds {
-    font-size: 0.32em;
+    font-size: 0.3em;
     font-weight: 400;
     opacity: 0.5;
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
     align-self: flex-start;
-    margin-top: 0.4em;
+    margin-top: 0.5em;
     margin-left: 0.2em;
     font-variant-numeric: tabular-nums;
   }
 
   .date {
-    font-size: clamp(1.05rem, 3vw, 1.3rem);
-    font-weight: 400;
-    font-style: italic;
+    font-size: clamp(0.92rem, 2.6vw, 1.1rem);
+    font-weight: 500;
     color: var(--fg-muted);
-    letter-spacing: 0.04em;
-    font-variation-settings: 'opsz' 14, 'SOFT' 100;
-    margin-top: 4px;
-  }
-  .date .rest {
-    text-transform: lowercase;
+    letter-spacing: -0.005em;
+    text-align: center;
   }
 </style>
 </head>
 <body>
   <div class="stage">
-    <div class="time">
-      <span id="h">--</span><span class="separator">:</span><span id="m">--</span><span class="seconds" id="s">--</span>
+    <div class="widget">
+      <div class="time">
+        <span id="h">--</span><span class="separator">:</span><span id="m">--</span><span class="seconds" id="s">--</span>
+      </div>
+      <div class="date" id="date">—</div>
     </div>
-    <div class="date" id="date">—</div>
   </div>
 
   <script>
@@ -115,7 +121,7 @@
 
       const weekday = now.toLocaleDateString('de-DE', { weekday: 'long' });
       const rest = now.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
-      dateEl.innerHTML = `<span class="weekday">${weekday}</span><span class="rest">, ${rest}</span>`;
+      dateEl.textContent = `${weekday}, ${rest}`;
     }
 
     tick();
